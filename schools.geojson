@@ -1,0 +1,44 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "school_name": "Washington Elementary",
+          "IPR_EST": 2.3,
+          "IPR_SE": 0.4,
+          "White_Students": 452
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-82.9988, 39.9612]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "school_name": "Lincoln High School",
+          "IPR_EST": 3.1,
+          "IPR_SE": 0.3,
+          "White_Students": 65
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-83.0123, 39.9723]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "school_name": "Jefferson Middle School",
+          "IPR_EST": 1.8,
+          "IPR_SE": 0.5,
+          "White_Students": 386
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-82.9876, 39.9432]
+        }
+      }
+    ]
+  }

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Map</title>
+
+    <!--My CSS Files-->
+    <link rel="stylesheet" href="first-layer.css"/>
+    <link rel="stylesheet" href="map.css"/>
+
+    <!--Linking W3.CSS-->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> 
+
+    <!--Linking W3.CSS Highway Color Library-->
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-highway.css">
+
+    <!--Leaflet Code-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
+     <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <!--Leaflet Geolocate-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.83.1/dist/L.Control.Locate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.83.1/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+
+    <!--Leaflet Ruler Function-->
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/gokertanrisever/leaflet-ruler@master/src/leaflet-ruler.css"
+    integrity="sha384-P9DABSdtEY/XDbEInD3q+PlL+BjqPCXGcF8EkhtKSfSTr/dS5PBKa9+/PMkW2xsY"
+    crossorigin="anonymous"
+        />
+        <script
+            src="https://cdn.jsdelivr.net/gh/gokertanrisever/leaflet-ruler@master/src/leaflet-ruler.js"
+            integrity="sha384-8SqKZR7V8uOetpjjbcNJHvwuHpb074WS0UXjCLhzfJUqYn3B/uWx1WVv5mwRp1mV"
+            crossorigin="anonymous"
+        ></script>
+
+    <!--Linking Leaflet Reset Function-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.js"></script>
+   
+    <!-- After Leaflet script -->
+    <script src="https://unpkg.com/leaflet.featuregroup.subgroup@1.0.2/dist/leaflet.featuregroup.subgroup.js"></script>    
+    
+    <!--Adding Leaflet Marker Cluster-->
+    <link rel="stylesheet" href="Leaflet.markercluster-1.4.1 2/dist/MarkerCluster.css">
+    <script src="Leaflet.markercluster-1.4.1 2/dist/leaflet.markercluster.js"></script>
+
+    <!--My Favicon-->
+    <link rel="icon" href="images/favicon.ico" alt="carrot icon">
+
+        <!--My Javascript-->
+        <script src="schools.geojson"></script>
+
+</head>
+<body>
+
+    <!--Map-->
+<br>
+<div class="w3-display-container">
+<div id="map"></div>
+<script>var map = L.map('map').setView([39.9612, -82.9988], 7);
+   var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    
+    var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+	minZoom: 0,
+	maxZoom: 20,
+	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	ext: 'png'
+});
+
+var Stadia_Outdoors = L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.{ext}', {
+    minZoom: 0,
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    ext: 'png'
+});
+
+
+
+// Leaflet Layer Control
+var baseMaps = {
+                    'Open Street Map': osm,
+                    'Dark': Stadia_AlidadeSmoothDark,
+                    'Light': Stadia_Outdoors,
+
+                };
+            </script>
+
+<script>
+    // Replace the current fetch and school data section with this code
+
+// Create a marker cluster group for schools
+var schoolCluster = L.markerClusterGroup();
+
+
+// Load the GeoJSON data and add it to the map
+fetch("schools.geojson") // Change this to your actual GeoJSON file
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status); 
+        }
+        return response.json();
+    })
+
+    .then(data => {
+        console.log("Data loaded successfully:", data); //Debug logging
+
+        // Create GeoJSON layer with custom styling and popup
+        var schools = L.geoJSON(data, {
+            pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, {icon: schoolIcon});
+            },
+            onEachFeature: function(feature, layer) {
+                //Access properties safely 
+                var props = feature.properties || {};
+                    // Create rich popup content with properties from your GeoJSON
+                    var popupContent = `
+                    <div class="school-popup">
+                        <h3>${props.school_name || 'School Name'}</h3>
+                        <p><strong>Income-to-Poverty Ratio:</strong> ${props.IPR_EST || 'N/A'}</p>
+                        <p><strong>Standard Error:</strong> ${props.IPR_SE || 'N/A'}</p>
+                        <p><strong>White Students:</strong> ${props['White_Students'] || props.White_Students || 'N/A'}</p>
+                    </div>
+                `;
+                
+                layer.bindPopup(popupContent);
+                
+                
+                // Add hover effect for Fast Facts
+                layer.on({
+                    mouseover: function(e) {
+                        this.openPopup();
+                        // Update Fast Facts section
+                        document.getElementById("fact-content").innerHTML = `
+                            <strong>${props.school_name || 'School Name'}</strong><br>
+                            Income-to-Poverty Ratio: ${props.IPR_EST || 'N/A'}<br>
+                            Enrollment: ${props.IPR_SE || 'N/A'}<br>
+                            Grade Levels: ${props['White_Students'] || props.White_Students || 'N/A'}
+                        `;
+                    },
+                    mouseout: function(e) {
+                        // Reset Fast Facts when no feature is hovered
+                        document.getElementById("fact-content").innerHTML = "Hover over a location to see details.";
+                    }
+                });
+            }
+        });
+        
+        // Add schools to the cluster group
+        schoolCluster.addLayer(schools);
+        
+        // Add the cluster group to the map
+        map.addLayer(schoolCluster);
+        
+        // Add school layer to layer control
+        overlayMaps["Schools"] = schoolCluster;
+        
+        // Update layer control
+        L.control.layers(baseMaps, overlayMaps).addTo(map);
+    })
+    .catch(error => console.error("Error loading school data:", error));
+
+    // Show error on the page
+    document.getElementById("fact-content").innerHTML = `Error loading data: ${error.message}`;
+</script>
+</body>
+</html>

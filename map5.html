@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Map</title>
+
+    <!--My CSS Files-->
+    <link rel="stylesheet" href="first-layer.css"/>
+    <link rel="stylesheet" href="map.css"/>
+
+    <!--Linking W3.CSS-->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> 
+
+    <!--Linking W3.CSS Highway Color Library-->
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-highway.css">
+
+    <!--Leaflet Code-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
+     <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <!--Leaflet Geolocate-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.83.1/dist/L.Control.Locate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.83.1/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+
+    <!--Leaflet Ruler Function-->
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/gokertanrisever/leaflet-ruler@master/src/leaflet-ruler.css"
+    integrity="sha384-P9DABSdtEY/XDbEInD3q+PlL+BjqPCXGcF8EkhtKSfSTr/dS5PBKa9+/PMkW2xsY"
+    crossorigin="anonymous"
+    />
+    <script
+        src="https://cdn.jsdelivr.net/gh/gokertanrisever/leaflet-ruler@master/src/leaflet-ruler.js"
+        integrity="sha384-8SqKZR7V8uOetpjjbcNJHvwuHpb074WS0UXjCLhzfJUqYn3B/uWx1WVv5mwRp1mV"
+        crossorigin="anonymous"
+    ></script>
+
+    <!--Linking Leaflet Reset Function-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.js"></script>
+   
+    <!-- After Leaflet script -->
+    <script src="https://unpkg.com/leaflet.featuregroup.subgroup@1.0.2/dist/leaflet.featuregroup.subgroup.js"></script>    
+    
+    <!--Adding Leaflet Marker Cluster-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <!--My Favicon-->
+    <link rel="icon" href="images/favicon.ico" alt="carrot icon">
+
+    <!--My Javascript-->
+    <script src="schools.js"></script>
+    <style>
+        /* Add this to ensure the map displays properly */
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        
+        /* School popup styles */
+        .school-popup h3 {
+            color: #3366cc;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .school-popup {
+            max-width: 300px;
+        }
+
+        .school-popup p {
+            margin: 5px 0;
+        }
+
+        /* For the school marker if using divIcon */
+        .school-marker {
+            border-radius: 50%;
+        }
+
+        /* Optional: style the fast facts section */
+        #fast-facts {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            min-height: 100px;
+            margin-top: 20px;
+        }
+
+        #fast-facts:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <!--Map-->
+    <div class="w3-display-container">
+        <div id="map"></div>
+        
+        <!--Create a "Fast Facts" Section-->
+        <div id="fast-facts" class="w3-container w3-card-4 w3-light-gray w3-round-xlarge w3-padding w3-margin">
+            <h2>Fast Facts</h2>
+            <p id="fact-content">Hover over a location to see details.</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([39.9612, -82.9988], 7);
+        
+        // Base layers
+        var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+        
+        var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+            minZoom: 0,
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            ext: 'png'
+        });
+
+        var Stadia_Outdoors = L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.{ext}', {
+            minZoom: 0,
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            ext: 'png'
+        });
+
+        // Define base and overlay layers
+        var baseMaps = {
+            'Open Street Map': osm,
+            'Dark': Stadia_AlidadeSmoothDark,
+            'Light': Stadia_Outdoors
+        };
+        
+
+        // Create a marker cluster group for schools
+        var schoolCluster = L.markerClusterGroup();
+
+        var overlayMaps = {
+            'Schools': schoolCluster
+        };
+        
+
+        // Add map controls
+        L.control.locate().addTo(map);
+        L.control.scale({ 
+            position: 'bottomleft',
+            display: 'mi'
+        }).addTo(map);
+        L.control.ruler({ position: 'topleft' }).addTo(map);
+        L.control.resetView({ position: "topleft", latlng: [39.9612, -82.9988], zoom: 7 }).addTo(map);
+        L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+
+        // School icon definition
+        var schoolIcon = L.divIcon({
+            html: '<div style="background-color: #4285F4; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white;"></div>',
+            className: 'school-marker',
+            iconSize: [14, 14],
+            iconAnchor: [7, 7]
+        });
+
+        // Load the GeoJSON data and add it to the map
+        fetch("schools.geojson")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Data loaded successfully:", data);
+                
+                // Create GeoJSON layer with custom styling and popup
+                var schools = L.geoJSON(data, {
+                    pointToLayer: function(feature, latlng) {
+                        return L.marker(latlng, {icon: schoolIcon});
+                    },
+                    onEachFeature: function(feature, layer) {
+                        // Access properties safely
+                        var props = feature.properties || {};
+                        
+                        // Create rich popup content with properties from your GeoJSON
+                        var popupContent = `
+                            <div class="school-popup">
+                                <h3>${props.school_name || 'School Name'}</h3>
+                                <p><strong>Income-to-Poverty Ratio:</strong> ${props.IPR_EST || 'N/A'}</p>
+                                <p><strong>Standard Error:</strong> ${props.IPR_SE || 'N/A'}</p>
+                                <p><strong>White Students:</strong> ${props.White_Students || 'N/A'}</p>
+                            </div>
+                        `;
+                        
+                        layer.bindPopup(popupContent);
+                        
+                        // Add hover effect for Fast Facts
+                        layer.on({
+                            mouseover: function(e) {
+                                this.openPopup();
+                                // Update Fast Facts section
+                                document.getElementById("fact-content").innerHTML = `
+                                    <strong>${props.school_name || 'School Name'}</strong><br>
+                                    Income-to-Poverty Ratio: ${props.IPR_EST || 'N/A'}<br>
+                                    Standard Error: ${props.IPR_SE || 'N/A'}<br>
+                                    White Students: ${props.White_Students || 'N/A'}
+                                `;
+                            },
+                            mouseout: function(e) {
+                                // Reset Fast Facts when no feature is hovered
+                                document.getElementById("fact-content").innerHTML = "Hover over a location to see details.";
+                            }
+                        });
+                    }
+                });
+                
+                // Add schools to the cluster group
+                schoolCluster.addLayer(schools);
+                
+                // Add the cluster group to the map
+                map.addLayer(schoolCluster);
+                
+                // Add school layer to layer control
+                overlayMaps["Schools"] = schoolCluster;
+                
+                // Update layer control by removing the previous one and adding a new one
+                map.removeControl(map._controlsById);
+                L.control.layers(baseMaps, overlayMaps).addTo(map);
+            })
+            .catch(err => {
+                console.error("Error loading school data:", err);
+                // Show error on the page
+                document.getElementById("fact-content").innerHTML = `Error loading data: ${err.message}`;
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+
+    <!--My CSS Files-->
+    <link rel="stylesheet" href="first-layer.css"/>
+    
+
+    <!--Linking W3.CSS-->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> 
+
+    <!--Linking W3.CSS Highway Color Library-->
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-highway.css">
+
+    <!--Leaflet Code-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
+     <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <!--Leaflet Geolocate-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.83.1/dist/L.Control.Locate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.83.1/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+
+       <!--Leaflet Ruler Function-->
+       <link
+       rel="stylesheet"
+       href="https://cdn.jsdelivr.net/gh/gokertanrisever/leaflet-ruler@master/src/leaflet-ruler.css"
+       integrity="sha384-P9DABSdtEY/XDbEInD3q+PlL+BjqPCXGcF8EkhtKSfSTr/dS5PBKa9+/PMkW2xsY"
+       crossorigin="anonymous"
+           />
+           <script
+               src="https://cdn.jsdelivr.net/gh/gokertanrisever/leaflet-ruler@master/src/leaflet-ruler.js"
+               integrity="sha384-8SqKZR7V8uOetpjjbcNJHvwuHpb074WS0UXjCLhzfJUqYn3B/uWx1WVv5mwRp1mV"
+               crossorigin="anonymous"
+           ></script>
+
+    <!--Linking Leaflet Reset Function-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.js"></script>
+   
+    <!-- After Leaflet script -->
+    <script src="https://unpkg.com/leaflet.featuregroup.subgroup@1.0.2/dist/leaflet.featuregroup.subgroup.js"></script>    
+    
+    <!--My Javascript-->
+    <script src="school_cleaned.js"></script>
+
+    <!--My Favicon-->
+    <link rel="icon" href="images/favicon.ico" alt="carrot icon">
+
+</head>
+<body>
+<!--Navigation Menu-->
+
+<nav class="w3-bar w3-light-gray w3-">
+    <p class="w3-left w3-margin-left">Homepage</p>
+    <a href="contact.html" class="w3-bar-item w3-button w3-mobile w3-right">Contact</a>
+    <a href="services.html"class="w3-bar-item w3-button w3-mobile w3-right">Services</a>
+    <a href="portfolio.html" class="w3-bar-item w3-button w3-mobile w3-right">Portfolio</a>
+    <a href="map.html" class="w3-bar-item w3-button w3-mobile w3-right">Map</a>
+    <a href="about.html" class="w3-bar-item w3-button w3-mobile w3-right">About</a>
+    <a href="index.html" class="w3-bar-item w3-button w3-mobile w3-right" aria-label="current page">Home</a>
+</nav>
+
+<!--Map-->
+<br>
+<div class="w3-display-container">
+<div id="map" style="height: 500px; width: 100%; z-index: 2;"></div>
+<script>var map = L.map('map').setView([40.1, -77.809859], 7);
+   var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    
+    var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+	minZoom: 0,
+	maxZoom: 20,
+	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	ext: 'png'
+});
+
+var Stadia_Outdoors = L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.{ext}', {
+    minZoom: 0,
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    ext: 'png'
+});
+
+
+
+// Leaflet Layer Control
+var baseMaps = {
+                    'Open Street Map': osm,
+                    'Dark': Stadia_AlidadeSmoothDark,
+                    'Light': Stadia_Outdoors,
+
+                };
+
+
+
+
+
+// Geolocate feature
+L.control.locate().addTo(map);
+
+// Adding Scale
+L.control.scale({
+    metric: true,
+    imperial: true,
+    maxWidth: 100,
+    position: 'bottomleft',
+}).addTo(map);
+
+// Add Ruler to map 
+L.control.ruler({
+    position: 'topleft',
+    lengthUnit: {                 // You can use custom length units. Default unit is kilometers.
+        display: 'mi',              // This is the display value will be shown on the screen. Example: 'meters'
+        decimal: 2,                 // Distance result will be fixed to this value.
+        factor: null,               // This value will be used to convert from kilometers. Example: 1000 (from kilometers to meters)
+        label: 'Distance:'
+      },
+      
+}).addTo(map);
+
+// Adding Reset Feature
+L.control.resetView({
+    position: "topleft",
+    title: "Reset view",
+    latlng: L.latLng([40.690003, -85.809859]),
+    zoom: 7,
+}).addTo(map);
+
+// Adding Checkable Layers
+var schools = L.layerGroup(); 
+var schooldistricts = L.layerGroup();
+var medianincome = L.layerGroup();
+var asthmacases = L.layerGroup();
+var povertylevel = L.layerGroup();
+var bikeinfrastructure = L.layerGroup();
+var grocerystores = L.layerGroup();
+var freestores = L.layerGroup();
+var blackownedfarms = L.layerGroup();
+var ecologicalzones = L.layerGroup();
+
+var overlayMaps = {
+    'Schools': schools,
+    'School Districts': schooldistricts,
+    'Median Income': medianincome,
+    'Asthma Cases': asthmacases,
+    'Poverty Level': povertylevel,
+    'Bike Infrastructure': bikeinfrastructure,
+    'Grocery Stores': grocerystores,
+    'Free Stores': freestores,
+    'Black-Owned Farms': blackownedfarms,
+    'Ecological Zones': ecologicalzones,
+};
+
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+
+
+</script>
+
+
+        <!--Map Welcome Card-->
+        <div class="w3-display-right w3-panel w3-card-4 w3-round-xlarge w3-hover-shadow w3-center" id="welcome-card">
+            <header class="w3-highway-blue w3-round-xlarge">
+            <h1>Welcome</h1>
+        </header>
+        <div class="w3-container">
+            <p>Zoom in and out, locate yourself, reset the map, and explore information about your community by toggling through different map layers.</p>
+        </div>
+        <footer class="w3-highway-blue w3-round-xlarge w3-margin-bottom">
+            <button class="w3-button" href="map.html">Explore the Map</button>
+        </footer>
+        <span onclick="this.parentElement.style.display='none'"
+        class="w3-button w3-small w3-light-gray w3-display-topright w3-round-xlarge">x</span>
+        </div>
+    </div>
+
+</body>
+
+<!--Fast Facts Section-->
+<!--Quick About-->
+
+<!--Quick About Card Header-->
+<div class="w3-card-4 w3-center w3-round-xlarge">
+    <header class="w3-container w3-highway-blue w3-round-xlarge">
+        <h1>Rooted Analytics</h1>
+    </header>
+
+<!--Quick About Text-->
+    <div class="w3-container">
+        <p>Everyone has a right to safe and comfortable housing, supportive community, fresh foods, and clean water. 
+            <br><br>
+            I'm working toward a society where people are valued for more than just their economic contribution.
+            <br><br>
+            I use data to amplify the voices of people in my community who need help most urgently.
+        </p>
+    </div>
+    
+<!--Contact Button-->
+    <footer class="w3-container-blue">
+        <button class="w3-btn w3-highway-blue w3-hover-shadow w3-margin-bottom"><a href="mailto:lovejoybennett@gmail.com"></a>Email Me</button>
+    </footer>
+</div>
+
+<!--Footer-->
+<div class="w3-panel w3-highway-blue" id="footer">
+    <ul>
+        Rooted Analytics &copy;
+        <li><a href="https://www.linkedin.com/in/bennettlovejoy/" target="_blank">LinkedIn</a></li>
+        <li><a href="https://medium.com/@lovejoybennett" target="_blank">Medium</a></li>
+        <li><a href="https://github.com/BennettLovejoy" target="_blank">GitHub</a></li>
+        <li><a href="mailto:rootedanalytics@gmail.com">Email</a></li>
+    </ul>
+
+    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+</div>
+    <script>// Get the button:
+        let mybutton = document.getElementById("myBtn");
+        
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+          if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+          } else {
+            mybutton.style.display = "none";
+          }
+        }
+        
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+          document.body.scrollTop = 0; // For Safari
+          document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }</script>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+#map {
+    height: 70vh;
+    width: 90%;
+    border: 10px;
+    margin: 10px;
+    justify-self: center;
+    z-index: 1;
+}
